@@ -33,7 +33,7 @@ extern "C" {
 *                                                                             *
 * The following constants should only be changed with caution because         *
 * they have been aligned to maintain internal consistency. The default values *
-* should be suitable for almost all environments.                             *
+* should be suitable for almost all environments though.                      *
 *                                                                             *
 ******************************************************************************/
 /**
@@ -106,9 +106,8 @@ typedef double tsReal;
 *         // Executed in any case.                                            *
 *     TS_END_TRY                                                              *
 *                                                                             *
-* Although it is always advisable to properly handle errors, embedding your   *
-* code into a TS_TRY/TS_END_TRY block as well as passing a pointer to a       *
-* tsStatus object is entirely optional:                                       *
+* Although it is recommended to always handle errors explicitly, the usage of *
+* TS_TRY/TS_END_TRY blocks is entirely optional:                              *
 *                                                                             *
 *     ts_bspline_to_beziers(&spline, &beziers, NULL);                         *
 *                                                                             *
@@ -900,7 +899,7 @@ tsBSpline TINYSPLINE_API ts_bspline_init();
  * @param[in] num_control_points
  * 	The number of control points of \p spline.
  * @param[in] dimension
- * 	The dimension of each control point of \p spline.
+ * 	The dimensionality of the control points of \p spline.
  * @param[in] degree
  * 	The degree of \p spline.
  * @param[in] type
@@ -924,6 +923,21 @@ tsBSpline TINYSPLINE_API ts_bspline_init();
 tsError TINYSPLINE_API ts_bspline_new(size_t num_control_points,
 	size_t dimension, size_t degree, tsBSplineType type, tsBSpline *spline,
 	tsStatus *status);
+
+/**
+ * Convenience macro for calling ::ts_bspline_new in try-catch-blocks.
+ */
+#define TS_BSPLINE_NEW(label, error, num_control_points, dimension, degree, \
+	type, spline, status) TS_CALL(label, error, ts_bspline_new(         \
+	num_control_points, dimension, degree, type, spline, status))
+
+/**
+ * Convenience macro which calls ::ts_bspline_new and returns (i.e., the
+ * program flow is interrupted with a return statement) in case of an error.
+ */
+#define TS_BSPLINE_NEW_ROE(error, num_control_points, dimension, degree, \
+	type, spline, status) TS_CALL_ROE(error, ts_bspline_new(         \
+	num_control_points, dimension, degree, type, spline, status))
 
 /**
  * Creates a new spline with given control points (varargs) and stores the
@@ -966,7 +980,7 @@ tsError TINYSPLINE_API ts_bspline_new_with_control_points(
 
 /**
  * Creates a deep copy of \p src and stores the copied values in \p dest. Does
- * nothing, if \p src == \p dest.
+ * nothing if \p src == \p dest.
  *
  * @param[in] src
  * 	The spline to deep copy.
@@ -981,6 +995,19 @@ tsError TINYSPLINE_API ts_bspline_new_with_control_points(
  */
 tsError TINYSPLINE_API ts_bspline_copy(const tsBSpline *src, tsBSpline *dest,
 	tsStatus *status);
+
+/**
+ * Convenience macro for calling ::ts_bspline_copy in try-catch-blocks.
+ */
+#define TS_BSPLINE_COPY(label, error, src, dest, status) TS_CALL(label, \
+	error, ts_bspline_copy(src, dest, status))
+
+/**
+ * Convenience macro which calls ::ts_bspline_copy and returns (i.e., the
+ * program flow is interrupted with a return statement) in case of an error.
+ */
+#define TS_BSPLINE_COPY_ROE(error, src, dest, status) TS_CALL_ROE(error, \
+	ts_bspline_copy(src, dest, status))
 
 /**
  * Moves the ownership of the data of \p src to \p dest. After calling this
@@ -1164,12 +1191,12 @@ tsError TINYSPLINE_API ts_bspline_interpolate_catmull_rom(const tsReal *points,
 *                                                                             *
 ******************************************************************************/
 /**
- * Evaluates \p spline at knot \p u and stores the result (cf. tsDeBoorNet) in
+ * Evaluates \p spline at \p knot and stores the result (cf. tsDeBoorNet) in
  * \p net.
  *
  * @param[in] spline
  * 	The spline to evaluate.
- * @param[in] u
+ * @param[in] knot
  * 	The knot to evaluate \p spline at.
  * @param[out] net
  * 	The output parameter
@@ -1178,12 +1205,25 @@ tsError TINYSPLINE_API ts_bspline_interpolate_catmull_rom(const tsReal *points,
  * @return TS_SUCCESS
  * 	On success.
  * @return TS_U_UNDEFINED
- * 	If \p spline is not defined at knot value \p u.
+ * 	If \p spline is not defined at knot value \p knot.
  * @return TS_MALLOC
  * 	If allocating memory failed.
  */
-tsError TINYSPLINE_API ts_bspline_eval(const tsBSpline *spline, tsReal u,
+tsError TINYSPLINE_API ts_bspline_eval(const tsBSpline *spline, tsReal knot,
 	tsDeBoorNet *net, tsStatus *status);
+
+/**
+ * Convenience macro for calling ::ts_bspline_eval in try-catch-blocks.
+ */
+#define TS_BSPLINE_EVAL(label, error, spline, knot, net, status) TS_CALL( \
+	label, error, ts_bspline_eval(spline, knot, net, status))
+
+/**
+ * Convenience macro which calls ::ts_bspline_eval and returns (i.e., the
+ * program flow is interrupted with a return statement) in case of an error.
+ */
+#define TS_BSPLINE_EVAL_ROE(error, spline, knot, net, status) TS_CALL_ROE( \
+	error, ts_bspline_eval(spline, knot, net, status))
 
 /**
  * Evaluates \p spline at knots \p us and stores the resultant points in
