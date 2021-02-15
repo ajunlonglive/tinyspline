@@ -579,6 +579,23 @@ tsError TINYSPLINE_API ts_bspline_set_control_points(tsBSpline *spline,
 	const tsReal *ctrlp, tsStatus *status);
 
 /**
+ * Convenience macro for calling ::ts_bspline_set_control_points in
+ * try-catch-blocks.
+ */
+#define TS_BSPLINE_SET_CONTROL_POINTS(label, error, spline, ctrlp, status) \
+	TS_CALL(label, error, ts_bspline_set_control_points(spline, ctrlp, \
+	status))
+
+/**
+ * Convenience macro which calls ::ts_bspline_set_control_points and returns
+ * (i.e., the control flow is interrupted with a return statement) in case of
+ * an error.
+ */
+#define TS_BSPLINE_SET_CONTROL_POINTS_ROE(error, spline, ctrlp, status) \
+	TS_CALL_ROE(error, ts_bspline_set_control_points(spline, ctrlp, \
+	status))
+
+/**
  * Sets the control point of \p spline at \p index. Creates a deep copy of
  * \p ctrlp.
  *
@@ -637,6 +654,19 @@ tsError TINYSPLINE_API ts_bspline_knots(const tsBSpline *spline,
 	tsReal **knots, tsStatus *status);
 
 /**
+ * Convenience macro for calling ::ts_bspline_knots in try-catch-blocks.
+ */
+#define TS_BSPLINE_KNOTS(label, error, spline, knots, status) TS_CALL(label, \
+	error, ts_bspline_knots(spline, knots, status))
+
+/**
+ * Convenience macro which calls ::ts_bspline_knots and returns (i.e., the
+ * control flow is interrupted with a return statement) in case of an error.
+ */
+#define TS_BSPLINE_KNOTS_ROE(error, spline, knots, status) TS_CALL_ROE(error, \
+	ts_bspline_knots(spline, knots, status))
+
+/**
  * Returns the knot of \p spline at \p index.
  *
  * @param[in] spline
@@ -673,6 +703,19 @@ tsError TINYSPLINE_API ts_bspline_knot_at(const tsBSpline *spline,
  */
 tsError TINYSPLINE_API ts_bspline_set_knots(tsBSpline *spline,
 	const tsReal *knots, tsStatus *status);
+
+/**
+ * Convenience macro for calling ::ts_bspline_set_knots in try-catch-blocks.
+ */
+#define TS_BSPLINE_SET_KNOTS(label, error, spline, knots, status) TS_CALL( \
+	label, error, ts_bspline_set_knots(spline, knots, status))
+
+/**
+ * Convenience macro which calls ::ts_bspline_set_knots and returns (i.e., the
+ * control flow is interrupted with a return statement) in case of an error.
+ */
+#define TS_BSPLINE_SET_KNOTS_ROE(error, spline, knots, status) TS_CALL_ROE( \
+	error, ts_bspline_set_knots(spline, knots, status))
 
 /**
  * Sets the knots of \p spline supplied as varargs. As all splines have at
@@ -933,7 +976,7 @@ tsError TINYSPLINE_API ts_bspline_new(size_t num_control_points,
 
 /**
  * Convenience macro which calls ::ts_bspline_new and returns (i.e., the
- * program flow is interrupted with a return statement) in case of an error.
+ * control flow is interrupted with a return statement) in case of an error.
  */
 #define TS_BSPLINE_NEW_ROE(error, num_control_points, dimension, degree, \
 	type, spline, status) TS_CALL_ROE(error, ts_bspline_new(         \
@@ -1004,7 +1047,7 @@ tsError TINYSPLINE_API ts_bspline_copy(const tsBSpline *src, tsBSpline *dest,
 
 /**
  * Convenience macro which calls ::ts_bspline_copy and returns (i.e., the
- * program flow is interrupted with a return statement) in case of an error.
+ * control flow is interrupted with a return statement) in case of an error.
  */
 #define TS_BSPLINE_COPY_ROE(error, src, dest, status) TS_CALL_ROE(error, \
 	ts_bspline_copy(src, dest, status))
@@ -1220,7 +1263,7 @@ tsError TINYSPLINE_API ts_bspline_eval(const tsBSpline *spline, tsReal knot,
 
 /**
  * Convenience macro which calls ::ts_bspline_eval and returns (i.e., the
- * program flow is interrupted with a return statement) in case of an error.
+ * control flow is interrupted with a return statement) in case of an error.
  */
 #define TS_BSPLINE_EVAL_ROE(error, spline, knot, net, status) TS_CALL_ROE( \
 	error, ts_bspline_eval(spline, knot, net, status))
@@ -1256,6 +1299,21 @@ tsError TINYSPLINE_API ts_bspline_eval(const tsBSpline *spline, tsReal knot,
  */
 tsError TINYSPLINE_API ts_bspline_eval_all(const tsBSpline *spline,
 	const tsReal *us, size_t num, tsReal **points, tsStatus *status);
+
+/**
+ * Convenience macro for calling ::ts_bspline_eval_all in try-catch-blocks.
+ */
+#define TS_BSPLINE_EVAL_ALL(label, error, spline, knots, num, points, status) \
+	TS_CALL(label, error, ts_bspline_eval_all(spline, knots, num, points, \
+	status))
+
+/**
+ * Convenience macro which calls ::ts_bspline_eval_all and returns (i.e., the
+ * control flow is interrupted with a return statement) in case of an error.
+ */
+#define TS_BSPLINE_EVAL_ALL_ROE(error, spline, knots, num, points, status) \
+	TS_CALL_ROE(error, ts_bspline_eval_all(spline, knots, num, points, \
+	status))
 
 /**
  * Generates a sequence of \p num different knots (The knots are equally
@@ -1501,6 +1559,21 @@ tsError TINYSPLINE_API ts_bspline_derive(const tsBSpline *spline, size_t n,
 	tsReal epsilon, tsBSpline *derivative, tsStatus *status);
 
 /**
+ * Convenience macro for calling ::ts_bspline_derive in try-catch-blocks.
+ */
+#define TS_BSPLINE_DERIVE(label, error, spline, n, epsilon, derivative,     \
+	status) TS_CALL(label, error, ts_bspline_derive(spline, n, epsilon, \
+	derivative, status))
+
+/**
+ * Convenience macro which calls ::ts_bspline_derive and returns (i.e., the
+ * control flow is interrupted with a return statement) in case of an error.
+ */
+#define TS_BSPLINE_DERIVE_ROE(error, spline, n, epsilon, derivative, status) \
+	TS_CALL_ROE(error, ts_bspline_derive(spline, n, epsilon, derivative, \
+	status))
+
+/**
  * Inserts the knot \p u up to \p num times into the knot vector of \p spline
  * and stores the result in \p result. Creates a deep copy of \p spline if
  * \p spline != \p result.
@@ -1551,6 +1624,19 @@ tsError TINYSPLINE_API ts_bspline_insert_knot(const tsBSpline *spline,
  */
 tsError TINYSPLINE_API ts_bspline_split(const tsBSpline *spline, tsReal u,
 	tsBSpline *split, size_t *k, tsStatus *status);
+
+/**
+ * Convenience macro for calling ::ts_bspline_split in try-catch-blocks.
+ */
+#define TS_BSPLINE_SPLIT(label, error, spline, knot, split, k, status) \
+	TS_CALL(label, error, ts_bspline_split(spline, knot, split, k, status))
+
+/**
+ * Convenience macro which calls ::ts_bspline_split and returns (i.e., the
+ * control flow is interrupted with a return statement) in case of an error.
+ */
+#define TS_BSPLINE_SPLIT_ROE(error, spline, knot, split, k, status) \
+	TS_CALL_ROE(error, ts_bspline_split(spline, knot, split, k, status))
 
 /**
  * Sets the control points of \p spline so that their tension corresponds the

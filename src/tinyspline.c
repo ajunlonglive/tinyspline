@@ -101,6 +101,10 @@ tsError ts_int_bspline_access_ctrlp_at(const tsBSpline *spline, size_t index,
 	TS_RETURN_SUCCESS(status)
 }
 
+#define TS_INT_BSPLINE_ACCESS_CTRLP_AT(label, error, spline, index, ctrlp,   \
+	status) TS_CALL(label, error, ts_int_bspline_access_ctrlp_at(spline, \
+	index, ctrlp, status))
+
 tsError ts_int_bspline_access_knot_at(const tsBSpline *spline, size_t index,
 	tsReal *knot, tsStatus *status)
 {
@@ -113,6 +117,10 @@ tsError ts_int_bspline_access_knot_at(const tsBSpline *spline, size_t index,
 	*knot = ts_int_bspline_access_knots(spline)[index];
 	TS_RETURN_SUCCESS(status)
 }
+
+#define TS_INT_BSPLINE_ACCESS_KNOT_AT(label, error, spline, index, knot,    \
+	status) TS_CALL(label, error, ts_int_bspline_access_knot_at(spline, \
+	index, knot, status))
 
 void ts_int_deboornet_init(tsDeBoorNet *_deBoorNet_)
 {
@@ -237,8 +245,8 @@ tsError ts_bspline_control_point_at(const tsBSpline *spline, size_t index,
 	size_t size;
 	tsError err;
 	TS_TRY(try, err, status)
-		TS_CALL(try, err, ts_int_bspline_access_ctrlp_at(
-			spline, index, &from, status))
+		TS_INT_BSPLINE_ACCESS_CTRLP_AT(try, err, spline, index, &from,
+			status)
 		size = ts_bspline_dimension(spline) * sizeof(tsReal);
 		*ctrlp = (tsReal*) malloc(size);
 		if (!*ctrlp) {
@@ -266,8 +274,8 @@ tsError ts_bspline_set_control_point_at(tsBSpline *spline, size_t index,
 	size_t size;
 	tsError err;
 	TS_TRY(try, err, status)
-		TS_CALL(try, err, ts_int_bspline_access_ctrlp_at(
-			spline, index, &to, status))
+		TS_INT_BSPLINE_ACCESS_CTRLP_AT(try, err, spline, index, &to,
+			status)
 		size = ts_bspline_dimension(spline) * sizeof(tsReal);
 		memcpy(to, ctrlp, size);
 	TS_END_TRY_RETURN(err)
@@ -342,8 +350,7 @@ tsError TINYSPLINE_API ts_bspline_set_knots_varargs(tsBSpline *spline,
 	tsError err;
 
 	TS_TRY(try, err, status)
-		TS_CALL(try, err, ts_bspline_knots(
-			spline, &values, status))
+		TS_BSPLINE_KNOTS(try, err, spline, &values, status)
 
 		values[0] = knot0;
 		values[1] = knot1;
@@ -352,8 +359,7 @@ tsError TINYSPLINE_API ts_bspline_set_knots_varargs(tsBSpline *spline,
 			values[idx] = (tsReal) va_arg(argp, double);
 		va_end(argp);
 
-		TS_CALL(try, err, ts_bspline_set_knots(
-			spline, values, status))
+		TS_BSPLINE_SET_KNOTS(try, err, spline, values, status)
 	TS_FINALLY
 		if (values)
 			free(values);
@@ -368,15 +374,14 @@ tsError ts_bspline_set_knot_at(tsBSpline *spline, size_t index, tsReal knot,
 	/* This is only for initialization. */
 	tsReal oldKnot = ts_int_bspline_access_knots(spline)[0];
 	TS_TRY(try, err, status)
-		TS_CALL(try, err, ts_int_bspline_access_knot_at(
-			spline, index, &oldKnot, status))
+		TS_INT_BSPLINE_ACCESS_KNOT_AT(try, err, spline, index,
+			&oldKnot, status)
 		/* knots must be set after reading oldKnot because the catch
 		 * block assumes that oldKnot contains the correct value if
 		 * knots is not NULL. */
 		knots = ts_int_bspline_access_knots(spline);
 		knots[index] = knot;
-		TS_CALL(try, err, ts_bspline_set_knots(
-			spline, knots, status))
+		TS_BSPLINE_SET_KNOTS(try, err, spline, knots, status)
 	TS_CATCH(err)
 		/* If knots is not NULL, oldKnot contains the correct value. */
 		if (knots)
@@ -524,6 +529,10 @@ tsError ts_int_bspline_generate_knots(const tsBSpline *spline,
 	TS_RETURN_SUCCESS(status)
 }
 
+#define TS_INT_BSPLINE_GENERATE_KNOTS(label, error, spline, type, status) \
+	TS_CALL(label, error, ts_int_bspline_generate_knots(spline, type, \
+	status))
+
 tsError ts_bspline_new(size_t num_control_points, size_t dimension,
 	size_t degree, tsBSplineType type, tsBSpline *spline, tsStatus *status)
 {
@@ -565,8 +574,7 @@ tsError ts_bspline_new(size_t num_control_points, size_t dimension,
 	spline->pImpl->n_knots = num_knots;
 
 	TS_TRY(try, err, status)
-		TS_CALL(try, err, ts_int_bspline_generate_knots(
-			spline, type, status))
+		TS_INT_BSPLINE_GENERATE_KNOTS(try, err, spline, type, status)
 	TS_CATCH(err)
 		ts_bspline_free(spline);
 	TS_END_TRY_RETURN(err)
@@ -774,6 +782,10 @@ tsError ts_int_thomas_algorithm(const tsReal *a, const tsReal *b,
 	TS_END_TRY_RETURN(err)
 }
 
+#define TS_INT_THOMAS_ALGORITHM(label, error, a, b, c, num, dim, d, status) \
+	TS_CALL(label, error, ts_int_thomas_algorithm(a, b, c, num, dim, d, \
+	status))
+
 tsError ts_int_relaxed_uniform_cubic_bspline(const tsReal *points, size_t n,
 	size_t dim, tsBSpline *spline, tsStatus *status)
 {
@@ -849,6 +861,11 @@ tsError ts_int_relaxed_uniform_cubic_bspline(const tsReal *points, size_t n,
 	TS_END_TRY_RETURN(err)
 }
 
+#define TS_INT_RELAXED_UNIFORM_CUBIC_BSPLINE(label, error, points,            \
+	num_points, dim, spline, status) TS_CALL(label, error,                \
+	ts_int_relaxed_uniform_cubic_bspline(points, num_points, dim, spline, \
+	status))
+
 tsError ts_bspline_interpolate_cubic_natural(const tsReal *points,
 	size_t num_points, size_t dimension, tsBSpline *spline,
 	tsStatus *status)
@@ -916,16 +933,15 @@ tsError ts_bspline_interpolate_cubic_natural(const tsReal *points,
 			for (i = 0; i < dimension; i++)
 				d[i] *= (tsReal) 0.25f;
 		} else {
-			TS_CALL(try, err, ts_int_thomas_algorithm(
-				a, b, c, num_int_points, dimension, d,
-				status))
+			TS_INT_THOMAS_ALGORITHM(try, err, a, b, c,
+				num_int_points, dimension, d, status)
 		}
 		memcpy(thomas, points, sof_ctrlp);
 		memmove(thomas + dimension, d, num_int_points * sof_ctrlp);
 		memcpy(thomas + (num_int_points+1) * dimension,
 		       points + (num_points-1) * dimension, sof_ctrlp);
-		TS_CALL(try, err, ts_int_relaxed_uniform_cubic_bspline(
-			thomas, num_points, dimension, spline, status))
+		TS_INT_RELAXED_UNIFORM_CUBIC_BSPLINE(try, err, thomas,
+			num_points, dimension, spline, status)
 	TS_CATCH(err)
 		ts_bspline_free(spline);
 	TS_FINALLY
@@ -1304,8 +1320,8 @@ tsError ts_bspline_sample(const tsBSpline *spline, size_t num, tsReal **points,
 	knots[num - 1] = max;
 	knots[0] = min;
 	TS_TRY(try, err, status)
-	       TS_CALL(try, err, ts_bspline_eval_all(
-			spline, knots, num, points, status))
+		TS_BSPLINE_EVAL_ALL(try, err, spline, knots, num, points,
+			status)
 	TS_FINALLY
 		free(knots);
 	TS_END_TRY_RETURN(err)
@@ -1392,8 +1408,8 @@ tsError ts_bspline_is_closed(const tsBSpline *spline, tsReal epsilon,
 
 	TS_TRY(try, err, status)
 		for (i = 0; i < deg; i++) {
-			TS_CALL(try, err, ts_bspline_derive(
-				spline, i, -1.f, &derivative, status))
+			TS_BSPLINE_DERIVE(try, err, spline, i, -1.f,
+				&derivative, status)
 			ts_bspline_domain(&derivative, &min, &max);
 			TS_BSPLINE_EVAL(try, err, &derivative, min, &first,
 				status)
@@ -1474,6 +1490,14 @@ tsError ts_int_bspline_resize(const tsBSpline *spline, int n, int back,
 	ts_bspline_move(&tmp, _resized_);
 	TS_RETURN_SUCCESS(status)
 }
+
+#define TS_INT_BSPLINE_RESIZE(label, error, spline, num, back, resized,  \
+	status) TS_CALL(label, error, ts_int_bspline_resize(spline, num, \
+	back, resized, status))
+
+#define TS_INT_BSPLINE_RESIZE_ROE(error, spline, num, back, resized, status) \
+	TS_CALL_ROE(error, ts_int_bspline_resize(spline, num, back, resized, \
+	status))
 
 tsError ts_bspline_derive(const tsBSpline *spline, size_t n, tsReal epsilon,
 	tsBSpline *derivative, tsStatus *status)
@@ -1595,8 +1619,7 @@ tsError ts_int_bspline_insert_knot(const tsBSpline *spline,
 	if (n == 0 || s+n > ts_bspline_order(spline))
 		return ts_bspline_copy(spline, result, status);
 
-	TS_CALL_ROE(err, ts_int_bspline_resize(
-		spline, (int)n, 1, result, status))
+	TS_INT_BSPLINE_RESIZE_ROE(err, spline, (int)n, 1, result, status)
 	ctrlp_spline = ts_int_bspline_access_ctrlp(spline);
 	knots_spline = ts_int_bspline_access_knots(spline);
 	ctrlp_result = ts_int_bspline_access_ctrlp(result);
@@ -1673,6 +1696,10 @@ tsError ts_int_bspline_insert_knot(const tsBSpline *spline,
 	TS_RETURN_SUCCESS(status)
 }
 
+#define TS_INT_BSPLINE_INSERT_KNOT(label, error, spline, net, num, result,    \
+	status) TS_CALL(label, error, ts_int_bspline_insert_knot(spline, net, \
+	num, result, status))
+
 tsError ts_bspline_insert_knot(const tsBSpline *spline, tsReal u, size_t num,
 	tsBSpline *result, size_t* k, tsStatus *status)
 {
@@ -1682,8 +1709,8 @@ tsError ts_bspline_insert_knot(const tsBSpline *spline, tsReal u, size_t num,
 	ts_int_deboornet_init(&net);
 	TS_TRY(try, err, status)
 		TS_BSPLINE_EVAL(try, err, spline, u, &net, status)
-		TS_CALL(try, err, ts_int_bspline_insert_knot(
-			spline, &net, num, result, status))
+		TS_INT_BSPLINE_INSERT_KNOT(try, err, spline, &net, num, result,
+			status)
 		ts_deboornet_free(&net);
 		TS_BSPLINE_EVAL(try, err, result, u, &net, status)
 		*k = ts_deboornet_index(&net);
@@ -1708,10 +1735,9 @@ tsError ts_bspline_split(const tsBSpline *spline, tsReal u, tsBSpline *split,
 			TS_BSPLINE_COPY(try, err, spline, split, status)
 			*k = ts_deboornet_index(&net);
 		} else {
-			TS_CALL(try, err, ts_int_bspline_insert_knot(
-				spline, &net,
+			TS_INT_BSPLINE_INSERT_KNOT(try, err, spline, &net,
 				ts_deboornet_num_insertions(&net) + 1, split,
-				status))
+				status)
 			*k = ts_deboornet_index(&net) +
 				ts_deboornet_num_insertions(&net) + 1;
 		}
@@ -1777,11 +1803,11 @@ tsError ts_bspline_to_beziers(const tsBSpline *spline, tsBSpline *beziers,
 		/* Fix first control point if necessary. */
 		u_min = knots[deg];
 		if (!ts_knots_equal(knots[0], u_min)) {
-			TS_CALL(try, err, ts_bspline_split(
-				&tmp, u_min, &tmp, &k, status))
+			TS_BSPLINE_SPLIT(try, err, &tmp, u_min, &tmp, &k,
+				status)
 			resize = (int)(-1*deg + (deg*2 - k));
-			TS_CALL(try, err, ts_int_bspline_resize(
-				&tmp, resize, 0, &tmp, status))
+			TS_INT_BSPLINE_RESIZE(try, err, &tmp, resize, 0, &tmp,
+				status)
 			knots = ts_int_bspline_access_knots(&tmp);
 			num_knots = ts_bspline_num_knots(&tmp);
 		}
@@ -1789,12 +1815,12 @@ tsError ts_bspline_to_beziers(const tsBSpline *spline, tsBSpline *beziers,
 		/* Fix last control point if necessary. */
 		u_max = knots[num_knots - order];
 		if (!ts_knots_equal(knots[num_knots - 1], u_max)) {
-			TS_CALL(try, err, ts_bspline_split(
-				&tmp, u_max, &tmp, &k, status))
+			TS_BSPLINE_SPLIT(try, err, &tmp, u_max, &tmp, &k,
+				status)
 			num_knots = ts_bspline_num_knots(&tmp);
 			resize = (int)(-1*deg + (k - (num_knots - order)));
-			TS_CALL(try, err, ts_int_bspline_resize(
-				&tmp, resize, 1, &tmp, status))
+			TS_INT_BSPLINE_RESIZE(try, err, &tmp, resize, 1, &tmp,
+				status)
 			knots = ts_int_bspline_access_knots(&tmp);
 			num_knots = ts_bspline_num_knots(&tmp);
 		}
@@ -1802,8 +1828,8 @@ tsError ts_bspline_to_beziers(const tsBSpline *spline, tsBSpline *beziers,
 		/* Split internal knots. */
 		k = order;
 		while (k < num_knots - order) {
-			TS_CALL(try, err, ts_bspline_split(
-				&tmp, knots[k], &tmp, &k, status))
+			TS_BSPLINE_SPLIT(try, err, &tmp, knots[k], &tmp, &k,
+				status)
 			knots = ts_int_bspline_access_knots(&tmp);
 			num_knots = ts_bspline_num_knots(&tmp);
 			k++;
@@ -1933,6 +1959,9 @@ tsError ts_int_bspline_to_json(const tsBSpline * spline, JSON_Value **value,
 	TS_END_TRY_RETURN(err)
 }
 
+#define TS_INT_BSPLINE_TO_JSON_ROE(error, spline, value, status) TS_CALL_ROE( \
+	error, ts_int_bspline_to_json(spline, value, status))
+
 tsError ts_int_bspline_from_json(const JSON_Value *spline_value,
 	tsBSpline *_spline_, tsStatus *status)
 {
@@ -2024,8 +2053,8 @@ tsError ts_int_bspline_from_json(const JSON_Value *spline_value,
 					(unsigned long) i)
 			ctrlp[i] = (tsReal) json_value_get_number(real_value);
 		}
-		TS_CALL(try, err, ts_bspline_set_control_points(
-			_spline_, ctrlp, status))
+		TS_BSPLINE_SET_CONTROL_POINTS(try, err, _spline_, ctrlp,
+			status)
 
 		/* Set knots. */
 		knots = ts_int_bspline_access_knots(_spline_);
@@ -2037,12 +2066,15 @@ tsError ts_int_bspline_from_json(const JSON_Value *spline_value,
 				(unsigned long) i)
 			knots[i] = (tsReal) json_value_get_number(real_value);
 		}
-		TS_CALL(try, err, ts_bspline_set_knots(
-			_spline_, knots, status))
+		TS_BSPLINE_SET_KNOTS(try, err, _spline_, knots, status)
 	TS_CATCH(err)
 		ts_bspline_free(_spline_);
 	TS_END_TRY_RETURN(err)
 }
+
+#define TS_INT_BSPLINE_FROM_JSON(label, error, spline_value, spline, status) \
+	TS_CALL(label, error, ts_int_bspline_from_json(spline_value, spline, \
+	status))
 
 tsError ts_bspline_to_json(const tsBSpline *spline, char **json,
 	tsStatus *status)
@@ -2050,7 +2082,7 @@ tsError ts_bspline_to_json(const tsBSpline *spline, char **json,
 	tsError err;
 	JSON_Value *value = NULL;
 	*json = NULL;
-	TS_CALL_ROE(err, ts_int_bspline_to_json(spline, &value, status))
+	TS_INT_BSPLINE_TO_JSON_ROE(err, spline, &value, status)
 	*json = json_serialize_to_string_pretty(value);
 	json_value_free(value);
 	if (!*json)
@@ -2070,8 +2102,7 @@ tsError ts_bspline_from_json(const char *json, tsBSpline *spline,
 			TS_RETURN_0(status, TS_PARSE_ERROR,
 				"invalid json input")
 		}
-		TS_CALL(try, err, ts_int_bspline_from_json(
-			value, spline, status))
+		TS_INT_BSPLINE_FROM_JSON(try, err, value, spline, status)
 	TS_FINALLY
 		if (value)
 			json_value_free(value);
@@ -2084,7 +2115,7 @@ tsError ts_bspline_save(const tsBSpline *spline, const char *path,
 	tsError err;
 	JSON_Status json_status;
 	JSON_Value *value = NULL;
-	TS_CALL_ROE(err, ts_int_bspline_to_json(spline, &value, status))
+	TS_INT_BSPLINE_TO_JSON_ROE(err, spline, &value, status)
 	json_status = json_serialize_to_file_pretty(value, path);
 	json_value_free(value);
 	if (json_status != JSONSuccess)
@@ -2109,8 +2140,7 @@ tsError ts_bspline_load(const char *path, tsBSpline *spline, tsStatus *status)
 			TS_RETURN_0(status, TS_PARSE_ERROR,
 				"invalid json input")
 		}
-		TS_CALL(try, err, ts_int_bspline_from_json(
-			value, spline, status))
+		TS_INT_BSPLINE_FROM_JSON(try, err, value, spline, status)
 	TS_FINALLY
 		if (file)
 			fclose(file);
