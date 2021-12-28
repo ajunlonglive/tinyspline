@@ -22,13 +22,15 @@ jobs:
     - name: LS
       shell: bash
       run: |
-        echo "INCLUDE"
-        ls -lah $(python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")
-        echo "PARENT"
-        ls -lah $(dirname $(python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())"))
-        echo "GRANDPARENT"
+        echo "Before"
         ls -lah $(dirname $(dirname $(python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")))
         echo "bin"
         ls -lah $(dirname $(dirname $(python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")))/bin
         echo "lib"
         ls -lah $(dirname $(dirname $(python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")))/lib
+        rpath=$(dirname $(dirname $(python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")))
+        if [ ! -e ${rpath}/Python ]; then
+            ln -s lib/libpython$(python -c "import platform; print('.'.join(platform.python_version_tuple()[0:2]))").dylib ${rpath}/Python
+        fi
+        echo "After"
+        ls -lah $(dirname $(dirname $(python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")))
