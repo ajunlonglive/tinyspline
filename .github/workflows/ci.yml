@@ -28,3 +28,7 @@ jobs:
         ls -lah $(dirname $(python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())"))
         echo "GRANDPARENT"
         ls -lah $(dirname $(dirname $(python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")))
+        echo "bin"
+        ls -lah $(dirname $(dirname $(python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")))/bin
+        echo "lib"
+        ls -lah $(dirname $(dirname $(python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")))/lib
